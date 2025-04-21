@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Organizacional</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .button-panel {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        .button-panel button,
+        .action-button { /* Estilo general para botones de acción */
+            padding: 10px 15px;
+            margin: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .button-panel button:hover,
+        .action-button:hover {
+            background-color: #0056b3;
+        }
+        .content-section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            /* Ocultar secciones por defecto, se mostrarían con JS */
+            /* display: none; */
+        }
+        .content-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        /* Estilos específicos para formularios (ejemplo) */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group textarea {
+            width: 95%; /* Ocupa casi todo el ancho */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            max-width: 400px; /* Limitar ancho máximo */
+        }
+        .form-group input[type="file"] {
+             width: auto; /* Ancho automático para input file */
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+         .form-group fieldset {
+             border: 1px solid #ccc;
+             padding: 10px;
+             margin-top: 5px;
+             border-radius: 4px;
+         }
+         .form-group legend {
+             font-weight: bold;
+             padding: 0 5px;
+         }
+         .form-group .radio-group label,
+         .form-group .checkbox-group label {
+            display: inline-block;
+            margin-right: 15px;
+            font-weight: normal;
+         }
+         .form-group .radio-group input[type="radio"],
+         .form-group .checkbox-group input[type="checkbox"] {
+             margin-right: 5px;
+         }
+
+        /* Estilo para la tabla de visualización */
+        #tabla-tareas-rol {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        #tabla-tareas-rol th,
+        #tabla-tareas-rol td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #tabla-tareas-rol th {
+            background-color: #e9e9e9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Sistema de Gestión Organizacional</h1>
+
+        <!-- Panel de Botones Principales -->
+        <div class="button-panel">
+            <h2>Acciones Principales</h2>
+            <button id="btn-alta-proceso">Alta de Proceso</button>
+            <button id="btn-alta-subproceso">Alta de Subproceso</button>
+            <button id="btn-definir-competencias">Definir Competencias</button>
+            <button id="btn-alta-tarea">Alta de Tarea</button>
+            <button id="btn-crear-rol">Crear Rol/Puesto</button>
+            <button id="btn-alinear-tarea-rol">Alinear Tareas a Roles</button>
+            <button id="btn-visualizar-tareas">Visualizar Tareas por Rol</button>
+            <button id="btn-crear-plan">Crear Plan de Trabajo</button>
+        </div>
+
+        <!-- Secciones de Contenido (Formularios/Vistas) -->
+        <!-- Estas secciones se mostrarían/ocultarían dinámicamente (por ejemplo, con JavaScript) -->
+
+        <div id="seccion-alta-proceso" class="content-section" style="display: none;">
+            <h3>Alta de Nuevo Proceso</h3>
+            <form>
+                <div class="form-group">
+                    <label for="nombre-proceso">Nombre del Proceso:</label>
+                    <input type="text" id="nombre-proceso" name="nombre-proceso" required>
+                </div>
+                 <div class="form-group">
+                    <label for="descripcion-proceso">Descripción:</label>
+                    <textarea id="descripcion-proceso" name="descripcion-proceso"></textarea>
+                </div>
+                <button type="submit" class="action-button">Guardar Proceso</button>
+            </form>
+        </div>
+
+        <div id="seccion-alta-subproceso" class="content-section" style="display: none;">
+            <h3>Alta de Nuevo Subproceso</h3>
+             <form>
+                <div class="form-group">
+                    <label for="proceso-padre">Proceso al que pertenece:</label>
+                    <select id="proceso-padre" name="proceso-padre" required>
+                        <option value="">-- Seleccione un Proceso --</option>
+                        <!-- Opciones se cargarían dinámicamente -->
+                        <option value="1">Proceso A</option>
+                        <option value="2">Proceso B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="nombre-subproceso">Nombre del Subproceso:</label>
+                    <input type="text" id="nombre-subproceso" name="nombre-subproceso" required>
+                </div>
+                 <div class="form-group">
+                    <label for="descripcion-subproceso">Descripción:</label>
+                    <textarea id="descripcion-subproceso" name="descripcion-subproceso"></textarea>
+                </div>
+                <button type="submit" class="action-button">Guardar Subproceso</button>
+            </form>
+        </div>
+
+        <div id="seccion-definir-competencias" class="content-section" style="display: none;">
+            <h3>Definir Competencias por Subproceso</h3>
+             <form>
+                 <div class="form-group">
+                    <label for="subproceso-competencia">Subproceso:</label>
+                    <select id="subproceso-competencia" name="subproceso-competencia" required>
+                        <option value="">-- Seleccione un Subproceso --</option>
+                        <!-- Opciones se cargarían dinámicamente -->
+                        <option value="sp1">Subproceso A.1</option>
+                        <option value="sp2">Subproceso B.1</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="nombre-competencia">Nombre de la Competencia:</label>
+                    <input type="text" id="nombre-competencia" name="nombre-competencia" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion-competencia">Descripción de la Competencia:</label>
+                    <textarea id="descripcion-competencia" name="descripcion-competencia"></textarea>
+                </div>
+                 <!-- Aquí podría haber una lista de competencias ya asociadas a este subproceso -->
+                 <h4>Competencias Asociadas a este Subproceso:</h4>
+                 <ul>
+                     <li>Competencia X</li>
+                     <li>Competencia Y</li>
+                 </ul>
+                <button type="submit" class="action-button">Añadir/Actualizar Competencia</button>
+            </form>
+        </div>
+
+        <div id="seccion-alta-tarea" class="content-section" style="display: none;">
+            <h3>Alta de Nueva Tarea</h3>
+            <form>
+                 <div class="form-group">
+                    <label for="subproceso-tarea">Subproceso al que pertenece:</label>
+                    <select id="subproceso-tarea" name="subproceso-tarea" required>
+                        <option value="">-- Seleccione un Subproceso --</option>
+                        <!-- Opciones se cargarían dinámicamente -->
+                         <option value="sp1">Subproceso A.1</option>
+                         <option value="sp2">Subproceso B.1</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="nombre-tarea">Nombre de la Tarea:</label>
+                    <input type="text" id="nombre-tarea" name="nombre-tarea" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion-tarea">Descripción:</label>
+                    <textarea id="descripcion-tarea" name="descripcion-tarea"></textarea>
+                </div>
+                <div class="form-group">
+                     <fieldset>
+                         <legend>Ciclo PHVA:</legend>
+                         <div class="radio-group">
+                            <input type="radio" id="ciclo-planear" name="ciclo-phva" value="planear" required>
+                            <label for="ciclo-planear">Planear</label>
+                            <input type="radio" id="ciclo-hacer" name="ciclo-phva" value="hacer">
+                            <label for="ciclo-hacer">Hacer</label>
+                            <input type="radio" id="ciclo-verificar" name="ciclo-phva" value="verificar">
+                            <label for="ciclo-verificar">Verificar</label>
+                            <input type="radio" id="ciclo-actuar" name="ciclo-phva" value="actuar">
+                            <label for="ciclo-actuar">Actuar</label>
+                         </div>
+                     </fieldset>
+                </div>
+                 <div class="form-group">
+                     <fieldset>
+                        <legend>Categoría de Tarea:</legend>
+                        <div class="radio-group">
+                            <input type="radio" id="cat-tecnica" name="categoria-tarea" value="tecnica" required>
+                            <label for="cat-tecnica">Tarea Técnica</label>
+                            <input type="radio" id="cat-gestion" name="categoria-tarea" value="gestion">
+                            <label for="cat-gestion">Tarea de Gestión</label>
+                        </div>
+                     </fieldset>
+                </div>
+                <button type="submit" class="action-button">Guardar Tarea</button>
+            </form>
+        </div>
+
+        <div id="seccion-crear-rol" class="content-section" style="display: none;">
+            <h3>Crear Nuevo Rol o Categoría de Puesto</h3>
+            <form>
+                <div class="form-group">
+                    <label for="nombre-rol">Nombre del Rol/Puesto:</label>
+                    <input type="text" id="nombre-rol" name="nombre-rol" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion-rol">Descripción del Rol:</label>
+                    <textarea id="descripcion-rol" name="descripcion-rol"></textarea>
+                </div>
+                <button type="submit" class="action-button">Guardar Rol</button>
+                 <!-- Aquí podría haber una lista de roles existentes -->
+                 <h4>Roles Existentes:</h4>
+                 <ul>
+                     <li>Analista Jr.</li>
+                     <li>Gerente de Proyecto</li>
+                 </ul>
+            </form>
+        </div>
+
+        <div id="seccion-alinear-tarea-rol" class="content-section" style="display: none;">
+            <h3>Alinear Tareas a Roles</h3>
+            <form>
+                 <div class="form-group">
+                    <label for="rol-seleccionado">Seleccione Rol:</label>
+                    <select id="rol-seleccionado" name="rol-seleccionado" required>
+                        <option value="">-- Seleccione un Rol --</option>
+                        <!-- Opciones se cargarían dinámicamente -->
+                        <option value="rol1">Analista Jr.</option>
+                        <option value="rol2">Gerente de Proyecto</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                     <fieldset>
+                         <legend>Seleccione las Tareas para este Rol:</legend>
+                         <div class="checkbox-group">
+                            <!-- Checkboxes se cargarían dinámicamente basados en tareas existentes -->
+                            <input type="checkbox" id="tarea-1" name="tareas_asignadas[]" value="1">
+                            <label for="tarea-1">Tarea 1 (Subproceso A.1)</label><br>
+                            <input type="checkbox" id="tarea-2" name="tareas_asignadas[]" value="2">
+                            <label for="tarea-2">Tarea 2 (Subproceso A.1)</label><br>
+                             <input type="checkbox" id="tarea-3" name="tareas_asignadas[]" value="3">
+                            <label for="tarea-3">Tarea 3 (Subproceso B.1)</label><br>
+                         </div>
+                     </fieldset>
+                 </div>
+                <button type="submit" class="action-button">Guardar Alineación</button>
+            </form>
+        </div>
+
+        <div id="seccion-visualizar-tareas" class="content-section" style="display: none;">
+            <h3>Visualizar Tareas por Rol</h3>
+            <div class="form-group">
+                <label for="filtro-rol">Filtrar por Rol:</label>
+                <select id="filtro-rol" name="filtro-rol">
+                    <option value="">-- Seleccione un Rol --</option>
+                     <!-- Opciones se cargarían dinámicamente -->
+                     <option value="rol1">Analista Jr.</option>
+                     <option value="rol2">Gerente de Proyecto</option>
+                     <option value="todos">Todos los Roles</option>
+                </select>
+                <button id="btn-filtrar-tareas" class="action-button" style="margin-left: 10px;">Filtrar</button>
+            </div>
+
+            <div id="resultado-visualizacion">
+                <h4>Tareas Asignadas al Rol Seleccionado</h4>
+                 <!-- La tabla se llenaría dinámicamente con JS/Backend -->
+                <table id="tabla-tareas-rol">
+                    <thead>
+                        <tr>
+                            <th>Tarea</th>
+                            <th>Descripción</th>
+                            <th>Proceso</th>
+                            <th>Subproceso</th>
+                            <th>Ciclo</th>
+                            <th>Categoría</th>
+                            <th>Competencias Requeridas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ejemplo de fila - esto se generaría dinámicamente -->
+                         <tr>
+                             <td>Realizar análisis inicial</td>
+                             <td>Análisis de requerimientos del cliente</td>
+                             <td>Desarrollo de SW</td>
+                             <td>Análisis y Diseño</td>
+                             <td>Planear</td>
+                             <td>Técnica</td>
+                             <td>Análisis de Requisitos, Comunicación</td>
+                         </tr>
+                         <tr>
+                             <td>Codificar módulo X</td>
+                             <td>Implementación de funcionalidad Z</td>
+                             <td>Desarrollo de SW</td>
+                             <td>Codificación</td>
+                             <td>Hacer</td>
+                             <td>Técnica</td>
+                             <td>Programación Java, Bases de Datos</td>
+                         </tr>
+                         <!-- Más filas aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+         <div id="seccion-crear-plan" class="content-section" style="display: none;">
+            <h3>Crear Plan de Trabajo</h3>
+            <form>
+                <div class="form-group">
+                    <label for="plan-nombre">Nombre del Plan:</label>
+                    <input type="text" id="plan-nombre" name="plan-nombre" required>
+                </div>
+                 <div class="form-group">
+                    <label for="plan-responsable">Responsable (Rol/Usuario):</label>
+                    <select id="plan-responsable" name="plan-responsable" required>
+                        <option value="">-- Seleccione Responsable --</option>
+                        <!-- Opciones se cargarían dinámicamente con usuarios/roles -->
+                        <option value="user1">Usuario A (Analista Jr.)</option>
+                        <option value="user2">Usuario B (Gerente)</option>
+                    </select>
+                </div>
+
+                 <div class="form-group">
+                     <fieldset>
+                         <legend>Seleccione Tareas Asignadas para este Plan:</legend>
+                         <div class="checkbox-group" id="tareas-asignadas-plan">
+                            <!-- Checkboxes se cargarían dinámicamente basados en las tareas asignadas al responsable seleccionado -->
+                            <p><i>Seleccione un responsable para ver sus tareas asignadas.</i></p>
+                            <!-- Ejemplo:
+                            <input type="checkbox" id="plan-tarea-1" name="plan_tareas[]" value="1">
+                            <label for="plan-tarea-1">Tarea Asignada 1</label><br>
+                            <input type="checkbox" id="plan-tarea-2" name="plan_tareas[]" value="2">
+                            <label for="plan-tarea-2">Tarea Asignada 2</label><br>
+                            -->
+                         </div>
+                     </fieldset>
+                 </div>
+
+                 <div class="form-group">
+                     <label for="plan-fecha-inicio">Fecha Inicio:</label>
+                     <input type="date" id="plan-fecha-inicio" name="plan-fecha-inicio" required>
+                 </div>
+                 <div class="form-group">
+                     <label for="plan-fecha-fin">Fecha Término:</label>
+                     <input type="date" id="plan-fecha-fin" name="plan-fecha-fin" required>
+                 </div>
+                  <div class="form-group">
+                    <label for="plan-subtareas">Descripción de Subtareas / Notas:</label>
+                    <textarea id="plan-subtareas" name="plan-subtareas" placeholder="Detalle aquí pasos específicos, notas o subtareas..."></textarea>
+                </div>
+                 <div class="form-group">
+                     <label for="plan-evidencia">Adjuntar Evidencia:</label>
+                     <input type="file" id="plan-evidencia" name="plan-evidencia" multiple>
+                 </div>
+
+                <button type="submit" class="action-button">Guardar Plan de Trabajo</button>
+            </form>
+        </div>
+
+    </div> <!-- Fin .container -->
+
+    <script>
+        // --- Código JavaScript Básico (Ejemplo para mostrar/ocultar secciones) ---
+
+        // Obtener todos los botones del panel principal
+        const mainButtons = document.querySelectorAll('.button-panel button');
+        // Obtener todas las secciones de contenido
+        const contentSections = document.querySelectorAll('.content-section');
+
+        // Función para ocultar todas las secciones
+        function hideAllSections() {
+            contentSections.forEach(section => {
+                section.style.display = 'none';
+            });
+        }
+
+        // Añadir event listeners a cada botón principal
+        mainButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                hideAllSections(); // Ocultar todas antes de mostrar la nueva
+
+                // Determinar qué sección mostrar basado en el ID del botón
+                const sectionId = 'seccion-' + button.id.substring(4); // ej: 'btn-alta-proceso' -> 'seccion-alta-proceso'
+                const sectionToShow = document.getElementById(sectionId);
+
+                if (sectionToShow) {
+                    sectionToShow.style.display = 'block'; // Mostrar la sección correspondiente
+                     // Opcional: Scroll hacia la sección mostrada
+                     sectionToShow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    console.warn("No se encontró la sección con ID:", sectionId);
+                }
+            });
+        });
+
+        // --- Lógica adicional (Ejemplos muy básicos) ---
+
+        // Lógica para el botón de filtrar en la sección de visualización
+        const btnFiltrar = document.getElementById('btn-filtrar-tareas');
+        if(btnFiltrar) {
+            btnFiltrar.addEventListener('click', () => {
+                const rolSeleccionado = document.getElementById('filtro-rol').value;
+                const tablaBody = document.querySelector('#tabla-tareas-rol tbody');
+                console.log(`Filtrando tareas para el rol: ${rolSeleccionado}`);
+                // --- Aquí iría la lógica real ---
+                // 1. Hacer una petición (fetch/AJAX) al backend con el rol seleccionado.
+                // 2. Recibir los datos de las tareas filtradas.
+                // 3. Limpiar el contenido actual de tablaBody (tablaBody.innerHTML = '';)
+                // 4. Crear las filas <tr> y celdas <td> con los datos recibidos y añadirlas a tablaBody.
+                alert(`Simulación: Filtrando tareas para el rol ID: ${rolSeleccionado}. La tabla se actualizaría aquí.`);
+                // Ejemplo de cómo añadir una fila (esto debería venir de datos reales)
+                 tablaBody.innerHTML = `
+                     <tr>
+                         <td>Tarea Filtrada 1</td>
+                         <td>Descripción de la tarea filtrada</td>
+                         <td>Proceso Filtrado</td>
+                         <td>Subproceso Filtrado</td>
+                         <td>Hacer</td>
+                         <td>Técnica</td>
+                         <td>Competencia Filtrada A</td>
+                     </tr>
+                     <tr>
+                         <td>Tarea Filtrada 2</td>
+                         <td>Otra descripción</td>
+                         <td>Proceso Filtrado</td>
+                         <td>Subproceso Filtrado</td>
+                         <td>Verificar</td>
+                         <td>Gestión</td>
+                         <td>Competencia Filtrada B</td>
+                     </tr>`;
+            });
+        }
+
+         // Lógica para cargar tareas al seleccionar responsable en Plan de Trabajo
+         const selectResponsablePlan = document.getElementById('plan-responsable');
+         const divTareasPlan = document.getElementById('tareas-asignadas-plan');
+
+         if(selectResponsablePlan && divTareasPlan) {
+             selectResponsablePlan.addEventListener('change', () => {
+                 const responsableId = selectResponsablePlan.value;
+                 console.log(`Cargando tareas para responsable: ${responsableId}`);
+                 divTareasPlan.innerHTML = ''; // Limpiar
+
+                 if(responsableId) {
+                     // --- Aquí iría la lógica real ---
+                     // 1. Hacer una petición (fetch/AJAX) para obtener las tareas asignadas a 'responsableId'.
+                     // 2. Recibir la lista de tareas.
+                     // 3. Por cada tarea, crear un input checkbox y un label y añadirlo a 'divTareasPlan'.
+
+                     // Simulación con datos de ejemplo:
+                     const tareasEjemplo = [
+                         { id: 10, nombre: 'Tarea Asignada A (para este resp.)' },
+                         { id: 15, nombre: 'Tarea Asignada B (para este resp.)' }
+                     ];
+
+                     if (tareasEjemplo.length > 0) {
+                         tareasEjemplo.forEach(tarea => {
+                             const checkboxId = `plan-tarea-${tarea.id}`;
+                             const checkbox = document.createElement('input');
+                             checkbox.type = 'checkbox';
+                             checkbox.id = checkboxId;
+                             checkbox.name = 'plan_tareas[]';
+                             checkbox.value = tarea.id;
+
+                             const label = document.createElement('label');
+                             label.htmlFor = checkboxId;
+                             label.textContent = ` ${tarea.nombre}`; // Espacio inicial para separar
+
+                             const br = document.createElement('br');
+
+                             divTareasPlan.appendChild(checkbox);
+                             divTareasPlan.appendChild(label);
+                             divTareasPlan.appendChild(br);
+                         });
+                     } else {
+                          divTareasPlan.innerHTML = '<p><i>Este responsable no tiene tareas asignadas pendientes.</i></p>';
+                     }
+
+                 } else {
+                     divTareasPlan.innerHTML = '<p><i>Seleccione un responsable para ver sus tareas asignadas.</i></p>';
+                 }
+             });
+         }
+
+
+    </script>
+
+</body>
+</html>
